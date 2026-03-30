@@ -1,0 +1,23 @@
+{
+  "name": "xprite-drop",
+  "version": "0.1.0",
+  "description": "Xprite-Drop: Full-stack SaaS application built with AIOX",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js",
+    "build": "echo 'Build script placeholder'",
+    "test": "echo 'Test script placeholder'",
+    "lint": "echo 'Lint script placeholder'",
+    "typecheck": "echo 'Typecheck script placeholder'"
+  },
+  "keywords": [
+    "aiox",
+    "fullstack",
+    "saas"
+  ],
+  "author": "Jhonny-Xprite",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {}
+}

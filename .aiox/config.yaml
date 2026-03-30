@@ -1,0 +1,83 @@
+---
+# AIOX Project Configuration
+# Generated: 2026-03-30
+# Project: xprite-drop
+
+project:
+  name: xprite-drop
+  version: 0.1.0
+  description: Full-stack SaaS application built with AIOX
+  owner: Jhonny-Xprite
+  type: web-app
+
+repository:
+  url: https://github.com/Jhonny-Xprite/xprite-drop
+  defaultBranch: master
+  initialized: true
+
+git:
+  user:
+    name: Jhonny-Xprite
+    email: noreply@github.com
+  protocol: https
+
+framework:
+  aiox:
+    version: "2.0"
+    location: .aiox-core
+    mode: project-development
+
+development:
+  language: javascript
+  runtime: node
+  packageManager: npm
+  typescript: false
+
+tools:
+  essential:
+    - git
+    - gh
+    - node
+    - npm
+  infrastructure:
+    - supabase
+    - railway
+    - docker
+  quality:
+    - coderabbit
+  optional:
+    - pnpm
+    - bun
+
+storage:
+  database:
+    type: supabase
+    status: not-configured
+    setup-command: supabase login
+
+  backend:
+    type: node
+    status: not-configured
+
+deployment:
+  primary: railway
+  status: not-configured
+  setup-command: railway login
+
+documentation:
+  structure:
+    stories: docs/stories
+    prd: docs/prd
+    architecture: docs/architecture
+    guides: docs/guides
+
+workflow:
+  agents-enabled: true
+  story-driven: true
+  qareview: true
+  coderabbit-integration: true
+
+metadata:
+  created-at: "2026-03-30T11:15:00.000Z"
+  initialized-by: devops
+  status: greenfield-bootstrap-complete

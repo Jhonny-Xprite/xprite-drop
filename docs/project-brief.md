@@ -247,11 +247,16 @@ BK-Reviews    briefing        [Otimiza]       Appmax       integrado
    - KPIs em tempo real (vendas, ROAS, LTV, tempo médio de atendimento)
    - Alertas de anomalias (produto de baixa conversão, fornecedor fora de estoque)
 
-2. **Squad de Mineração**
-   - Integração com Aliexpress + Dropar-Me
-   - Análise de produto (tendência, preço, competição)
-   - Recomendações de sourcing com IA
-   - Sincronização de catálogo
+2. **Squad de Mineração** (Powered by AliPrice Intelligence)
+   - ✨ **Busca Reversa por Imagem:** Upload de imagem → busca em 10+ plataformas (AliExpress, Taobao, 1688, Pinduoduo)
+   - 📈 **Price History Intelligence:** Coleta histórico 6 meses, detecta descontos reais vs. artificiais
+   - 🎯 **Smart Supplier Ranking:** Recomenda fornecedor baseado em confiabilidade, velocidade, qualidade (não só preço)
+   - 🤖 **AI-Powered Recommendations:** ML model sugere qual produto/fornecedor vai ter melhor ROAS baseado em histórico
+   - 📦 **Batch Intelligence:** Upload 50+ imagens → análise paralela → matriz de decisão
+   - 🔔 **Trend Mining Automático:** Monitora Dropar-Me + análise de imagem para identificar trends ANTES do concorrente
+   - 💡 **Integração com Dropar-Me, AliExpress, Taobao, 1688, Pinduoduo**
+   - 📊 **Sincronização de catálogo em tempo real** com dados de preço, fornecedor, tendência
+   - 🎨 **Versionamento de sourcing** (quais produtos testou, resultado, feedback)
 
 3. **Squad de Criação**
    - Integração com Canvas
@@ -276,6 +281,244 @@ BK-Reviews    briefing        [Otimiza]       Appmax       integrado
    - Histórico de pedido + contexto de cliente
    - Templates de resposta com IA
    - Dashboard de tickets abertos
+
+---
+
+## Estratégia de Mineração Inteligente (AliPrice Research)
+
+**Baseada em deep research da plataforma AliPrice.** Documento completo: `docs/research/aliprice-deep-analysis.md`
+
+### O Problema: Mineração Fragmentada Hoje
+
+Operadores de dropshipping gastam **15-30 min por produto** em:
+```
+1. Ver trending no TikTok/Instagram
+2. Procurar em AliExpress (não encontra)
+3. Procurar em Taobao (acha similar mas não exato)
+4. Procurar em 1688 (ainda outro preço)
+5. Comparar fornecedores manualmente
+6. Decidir se preço está bom (sem histórico)
+7. Importar para loja
+8. Ninguém rastreia: "aquele produto vendeu?"
+```
+
+**Resultado:** Muitos produtos ruins importados, perdendo dinheiro em anúncios ruins.
+
+### A Solução: Mineração Inteligente do Xprite-Drop
+
+**Fluxo transformado:**
+```
+Operador vê trending
+       ↓
+Screenshot imagem OU salva imagem
+       ↓
+UPLOAD NO XPRITE-DROP (1 clique)
+       ↓
+┌─────────────────────────────────────┐
+│ BUSCA REVERSA INTELIGENTE            │
+│ - Busca em paralelo: 10+ plataformas │
+│ - Retorna: preço, fornecedor, reviews│
+│ - Mostra histórico de preço (6 meses)│
+│ - Detecta: preço real vs. artificial │
+└─────────────────────────────────────┘
+       ↓
+┌─────────────────────────────────────┐
+│ ML RANKING DE FORNECEDOR             │
+│ Input histórico de vendas:           │
+│ - Qual fornecedor = menos chargeback?│
+│ - Qual preço = melhor conversão?     │
+│ - Qual imagem = mais vendas?         │
+│                                     │
+│ Output: "Fornecedor X: ROAS 2.1 ✓"   │
+└─────────────────────────────────────┘
+       ↓
+OPERADOR: 1 clique → IMPORTA COM CONFIANÇA
+       ↓
+┌─────────────────────────────────────┐
+│ FEEDBACK LOOP                       │
+│ Sistema rastreia:                   │
+│ - Cliques no anúncio                │
+│ - Conversão                         │
+│ - Reviews do cliente                │
+│ - Chargeback/devolução              │
+│                                     │
+│ ML Model aprende:                   │
+│ "Imagens com característica X       │
+│  + fornecedor Y + preço Z = ROAS W"  │
+└─────────────────────────────────────┘
+```
+
+**Tempo: 15-30 min → 2-3 min (10x mais rápido)**
+
+### 5 Capacidades Principais
+
+#### 1️⃣ Busca Reversa por Imagem (MVP-1)
+
+**O que faz:**
+- Operador faz upload de screenshot de trending
+- Sistema busca em paralelo: AliExpress, Taobao, 1688, Pinduoduo, Amazon
+- Retorna top 10-20 produtos similares com preço + fornecedor + reviews
+
+**Impacto:**
+- ⚡ 15 min → 1 min (mineração ultrarrápida)
+- 🎯 Padroniza descoberta de produto
+- 💾 Cada busca alimenta dados para IA
+
+**Tecnologia:**
+- Google Cloud Vision API (feature extraction)
+- APIs de cada plataforma (paralelo)
+- Redis cache (30 dias)
+
+---
+
+#### 2️⃣ Price History Intelligence (MVP-1)
+
+**O que faz:**
+- Coleta preço histórico de cada produto (últimos 6 meses)
+- Mostra gráfico visual de flutuações
+- Alerta: "Preço está 20% abaixo da média → oportunidade!"
+- Alerta: "Preço inflado artificialmente (histórico: R$ 10, hoje: R$ 25) → skip"
+
+**Impacto:**
+- 💰 Reduz margem perdida por mau timing
+- 🛡️ Protege contra fraudes de preço
+- 📊 Educação do operador (aprende padrões)
+
+**Tecnologia:**
+- Cron job coleta preços diários
+- TimeSeries database (InfluxDB)
+- Detecção de anomalias (zscore/isolation forest)
+
+---
+
+#### 3️⃣ Smart Supplier Ranking (MVP-1)
+
+**O que faz:**
+- Não mostra só preço → mostra **score composto**:
+  - Confiabilidade (taxa de cancelamento)
+  - Velocidade (tempo médio até enviar)
+  - Qualidade (taxa de devolução/reviews)
+  - Estabilidade de preço
+
+**Card visual:**
+```
+FORNECEDOR A         FORNECEDOR B (⭐ RECOMENDADO)
+Preço: R$ 10        Preço: R$ 12
+⚠️ Cancelamento: 15% ✅ Cancelamento: 2%
+Envio: 20 dias      Envio: 8 dias
+Reviews: 3.2★       Reviews: 4.7★
+Score: 45/100       Score: 89/100
+```
+
+**Impacto:**
+- ✅ Reduz chargeback
+- ✅ Melhora NPS (cliente recebe produto bom)
+- ✅ Menos carga de suporte
+
+---
+
+#### 4️⃣ AI Supplier Recommendation (MVP-1 ou Fase 1)
+
+**O que faz:**
+```
+Upload imagem de fone de ouvido (preço ~R$ 20-30)
+        ↓
+ML Model analisa histórico:
+"Para imagens similares nessa faixa de preço:"
+        ↓
+- Fornecedor A: ROAS esperado 1.8
+- Fornecedor B: ROAS esperado 2.1 ← RECOMENDADO
+- Fornecedor C: ROAS esperado 1.3
+        ↓
+Operador: 1 clique no recomendado
+```
+
+**Impacto:**
+- 🚀 Maior ROAS (máximo impacto em receita)
+- 🤖 Automação inteligente (máquina sugere, humano aprova)
+- 📈 Feedback loop treina modelo continuamente
+
+**ML Model:**
+- Features: características da imagem (CNN) + categoria + preço + fornecedor
+- Target: ROAS histórico
+- Algorithm: LightGBM/XGBoost
+- Retraining: semanal (novos dados de vendas)
+
+---
+
+#### 5️⃣ Batch Intelligence (MVP-1 ou Fase 1)
+
+**O que faz:**
+```
+Operador tem 50 imagens para validar
+        ↓
+Drag-drop 50 imagens no Xprite-Drop
+        ↓
+Sistema processa em paralelo (5-10 workers)
+        ↓
+2 MINUTOS DEPOIS:
+┌──────────────────────────────────────┐
+│ Matriz de decisão:                   │
+├──────────────────────────────────────┤
+│ Produto  │ Fornecedor | ROAS | Ação │
+├──────────────────────────────────────┤
+│ Fone A   │ B (88/100) │ 2.1 │ ✅    │
+│ Teclado  │ A (45/100) │ 1.3 │ ⏸️    │
+│ Mouse    │ C (92/100) │ 2.3 │ ✅    │
+│ ...      │ ...        │ ... │ ...  │
+└──────────────────────────────────────┘
+```
+
+**Impacto:**
+- ⚡ 50x mais rápido (1 hora → 2 minutos)
+- 📈 10x mais escalável (mesmo operador valida 500 produtos/dia)
+- 🎯 Padronização (mesmos critérios para todos)
+
+---
+
+### Fluxo Integrado: Mineração → Veiculação → Feedback
+
+```
+SQUAD MINERAÇÃO
+  ├─ Busca imagem
+  ├─ Coleta preço histórico
+  ├─ Recomenda fornecedor (ML)
+  └─ Import com confiança
+       ↓
+SQUAD CRIAÇÃO
+  ├─ IA gera briefing baseado em produtos similares
+  └─ Designer cria visual
+       ↓
+SQUAD VEICULAÇÃO
+  ├─ Análise de preço informa CPC bid
+  ├─ Histórico de imagens similares informa targeting
+  └─ Campaign gerada automática
+       ↓
+FEEDBACK LOOP (IA treina continuamente)
+  ├─ Qual imagem = melhor ROAS?
+  ├─ Qual fornecedor = menos chargeback?
+  ├─ Qual preço = melhor conversão?
+  └─ ML model aprende para próxima decisão
+```
+
+### Quick Wins: Implementação por Fase
+
+**MVP-1 (Semanas 3-8):**
+- ✅ Busca reversa por imagem
+- ✅ Price history dashboard
+- ✅ Supplier comparison card
+
+**Fase 1 (Semanas 9-14):**
+- ✅ Batch image processing
+- ✅ AI supplier recommendation
+- ✅ Trend mining automático
+
+**Fase 2 (Semanas 15+):**
+- ✅ Price optimization engine (qual preço ideal)
+- ✅ Campaign generation AI (copy + targeting automático)
+- ✅ Full feedback loop (circulação contínua de dados → IA)
+
+---
 
 ### Out of Scope for MVP
 - Análise de competidor em tempo real
@@ -405,6 +648,26 @@ Este Project Brief fornece contexto completo para **Xprite-Drop**. Próxima etap
 
 ---
 
+## Documentação de Pesquisa & Referências
+
+### Deep Research: AliPrice Analysis
+- 📁 **Arquivo:** `docs/research/aliprice-deep-analysis.md`
+- **Conteúdo:**
+  - Análise profunda da plataforma AliPrice
+  - 7 etapas de entendimento (features, engenharia reversa, oportunidades)
+  - Melhorias estratégicas (como superar AliPrice)
+  - Top 5 quick wins implementáveis
+  - Roadmap de 24 semanas
+  - Impacto esperado em ROAS, tempo de operação, escalabilidade
+
+### Como usar esta documentação
+1. **Para MVP Planning:** Consulte seção "Estratégia de Mineração Inteligente" (features MVP-1)
+2. **Para Roadmap:** Consulte seção "Fase 1" e "Fase 2" de quick wins
+3. **Para Technical Deep Dive:** Consulte `docs/research/aliprice-deep-analysis.md` (seção "Engenharia Reversa")
+4. **Para Competitive Analysis:** Consulte seção "Diferencial Competitivo" e "Melhorias Estratégicas"
+
+---
+
 **Documento gerado:** 2026-03-30
-**Status:** Draft - Pronto para feedback e refinamento
+**Status:** Draft v2 - Atualizado com AliPrice Research + Estratégia de Mineração Inteligente
 **Próximo Responsável:** @pm (PRD Creation)
